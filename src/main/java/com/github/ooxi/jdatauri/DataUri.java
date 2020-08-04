@@ -25,13 +25,8 @@ package com.github.ooxi.jdatauri;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * A data URI parser
@@ -128,22 +123,19 @@ public class DataUri {
 			return false;
 		}
 		final DataUri other = (DataUri) obj;
-		if ((this.mime == null) ? (other.mime != null) : !this.mime.equals(other.mime)) {
+		if (!Objects.equals(this.mime, other.mime)) {
 			return false;
 		}
-		if (this.charset != other.charset && (this.charset == null || !this.charset.equals(other.charset))) {
+		if (!Objects.equals(this.charset, other.charset)) {
 			return false;
 		}
-		if ((this.filename == null) ? (other.filename != null) : !this.filename.equals(other.filename)) {
+		if (!Objects.equals(this.filename, other.filename)) {
 			return false;
 		}
-		if ((this.contentDisposition == null) ? (other.contentDisposition != null) : !this.contentDisposition.equals(other.contentDisposition)) {
+		if (!Objects.equals(this.contentDisposition, other.contentDisposition)) {
 			return false;
 		}
-		if (!Arrays.equals(this.data, other.data)) {
-			return false;
-		}
-		return true;
+		return Arrays.equals(this.data, other.data);
 	}
 	
 	
@@ -179,7 +171,7 @@ public class DataUri {
 		 * representing the supported content encodings. (["base64"] for
 		 * example)
 		 */
-		Collection<String> supportedContentEncodings = Arrays.asList(
+		Collection<String> supportedContentEncodings = Collections.singletonList(
 			"base64"
 		);
 		
@@ -407,8 +399,9 @@ public class DataUri {
 			? null : supportedValues.get(FILENAME_OPTION_NAME);
 		final String finalContentDisposition = supportedValues.get(CONTENT_DISPOSITION_OPTION_NAME).isEmpty()
 			? null : supportedValues.get(CONTENT_DISPOSITION_OPTION_NAME);
+
 		final byte[] finalData = "base64".equalsIgnoreCase(contentEncoding)
-			? Base64.decodeBase64(data) : data.getBytes(charset);
+			? Base64.getDecoder().decode(data) : data.getBytes(charset);
 		
 		DataUri dataURIObject = new DataUri(
 			finalMimeType,
@@ -440,12 +433,12 @@ public class DataUri {
 			s.append(FILENAME_OPTION_NAME + "=").append(this.filename).append(";");
 		}
 
-		s.append("base64,").append(Base64.encodeBase64String(this.getData()));
+		s.append("base64,").append(Base64.getEncoder().encodeToString(this.getData()));
 
 		return s.toString();
 	}
 
-	private static final Pattern PLUS = Pattern.compile("+", Pattern.LITERAL);
+	private static final Pattern PLUS = Pattern.compile("\\+");
 
 	private static String percentDecode(String s, Charset cs) {
 		try {
