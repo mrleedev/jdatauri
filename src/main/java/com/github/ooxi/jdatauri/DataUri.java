@@ -44,9 +44,9 @@ public class DataUri {
 	private static final String CONTENT_DISPOSITION_OPTION_NAME = "content-disposition";
 
 	private final String mime;
-	private final Charset charset;
-	private final String filename;
-	private final String contentDisposition;
+	private final Optional<Charset> charset;
+	private final Optional<String> filename;
+	private final Optional<String> contentDisposition;
 	private final byte[] data;
 	
 	
@@ -57,9 +57,9 @@ public class DataUri {
 	
 	public DataUri(String mime, Charset charset, String filename, String contentDisposition, byte[] data) {
 		this.mime = mime;
-		this.charset = charset;
-		this.filename = filename;
-		this.contentDisposition = contentDisposition;
+		this.charset = Optional.ofNullable(charset);
+		this.filename = Optional.ofNullable(filename);
+		this.contentDisposition = Optional.ofNullable(contentDisposition);
 		this.data = data;
 		
 		if (null == mime) {
@@ -76,26 +76,11 @@ public class DataUri {
 		return mime;
 	}
 
-	/**
-	 * @warning May be null
-	 */
-	public Charset getCharset() {
-		return charset;
-	}
-	
-	/**
-	 * @warning May be null
-	 */
-	public String getFilename() {
-		return filename;
-	}
-	
-	/**
-	 * @warning May be null
-	 */
-	public String getContentDisposition() {
-		return contentDisposition;
-	}
+	public Optional<Charset> getCharset() { return charset; }
+
+	public Optional<String> getFilename() { return filename; }
+
+	public Optional<String> getContentDisposition() { return contentDisposition; }
 
 	public byte[] getData() {
 		return data;
@@ -106,10 +91,10 @@ public class DataUri {
 	@Override
 	public int hashCode() {
 		int hash = 3;
-		hash = 23 * hash + (this.mime != null ? this.mime.hashCode() : 0);
-		hash = 23 * hash + (this.charset != null ? this.charset.hashCode() : 0);
-		hash = 23 * hash + (this.filename != null ? this.filename.hashCode() : 0);
-		hash = 23 * hash + (this.contentDisposition != null ? this.contentDisposition.hashCode() : 0);
+		hash = 23 * hash + this.mime.hashCode();
+		hash = 23 * hash + this.charset.map(Charset::hashCode).orElse(0);
+		hash = 23 * hash + this.filename.map(String::hashCode).orElse(0);
+		hash = 23 * hash + this.contentDisposition.map(String::hashCode).orElse(0);
 		hash = 23 * hash + Arrays.hashCode(this.data);
 		return hash;
 	}
@@ -421,17 +406,14 @@ public class DataUri {
 		StringBuilder s = new StringBuilder();
 		s.append("data:").append(this.getMime()).append(";");
 
-		if (this.charset != null) {
-			s.append(CHARSET_OPTION_NAME + "=").append(this.charset.name()).append(";");
-		}
+		this.charset.ifPresent(c ->
+				s.append(CHARSET_OPTION_NAME + "=").append(c.name()).append(";"));
 
-		if (this.contentDisposition != null) {
-			s.append(CONTENT_DISPOSITION_OPTION_NAME + "=").append(this.contentDisposition).append(";");
-		}
+		this.contentDisposition.ifPresent(cd ->
+				s.append(CONTENT_DISPOSITION_OPTION_NAME + "=").append(cd).append(";"));
 
-		if (this.filename != null) {
-			s.append(FILENAME_OPTION_NAME + "=").append(this.filename).append(";");
-		}
+		this.filename.ifPresent(fname ->
+			s.append(FILENAME_OPTION_NAME + "=").append(fname).append(";"));
 
 		s.append("base64,").append(Base64.getEncoder().encodeToString(this.getData()));
 

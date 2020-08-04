@@ -23,8 +23,15 @@
 package com.github.ooxi.jdatauri;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import javax.swing.text.html.Option;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -41,11 +48,11 @@ public class DataUriTest {
 		final String test = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 		DataUri duri = DataUri.parse(test, UTF_8);
 		
-		Assert.assertEquals("image/gif", duri.getMime());
-		Assert.assertEquals(null, duri.getCharset());
-		Assert.assertEquals(null, duri.getFilename());
-		Assert.assertEquals(null, duri.getContentDisposition());
-		Assert.assertArrayEquals(new byte[] {71, 73, 70, 56, 57, 97, 1, 0, 1, 0, -128, 0, 0, -1, -1, -1, 0, 0, 0, 33, -7, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59}, duri.getData());
+		assertEquals("image/gif", duri.getMime());
+		assertEquals(Optional.empty(), duri.getCharset());
+		assertEquals(Optional.empty(), duri.getFilename());
+		assertEquals(Optional.empty(), duri.getContentDisposition());
+		assertArrayEquals(new byte[] {71, 73, 70, 56, 57, 97, 1, 0, 1, 0, -128, 0, 0, -1, -1, -1, 0, 0, 0, 33, -7, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59}, duri.getData());
 	}
 	
 	
@@ -58,11 +65,11 @@ public class DataUriTest {
 		
 		DataUri duri = new DataUri(EXPECTED_MIME, EXPECTED_CHARSET, EXPECTED_DATA);
 		
-		Assert.assertEquals(EXPECTED_MIME, duri.getMime());
-		Assert.assertEquals(EXPECTED_CHARSET, duri.getCharset());
-		Assert.assertEquals(null, duri.getFilename());
-		Assert.assertEquals(null, duri.getContentDisposition());
-		Assert.assertArrayEquals(EXPECTED_DATA, duri.getData());
+		assertEquals(EXPECTED_MIME, duri.getMime());
+		assertEquals(Optional.of(EXPECTED_CHARSET), duri.getCharset());
+		assertEquals(Optional.empty(), duri.getFilename());
+		assertEquals(Optional.empty(), duri.getContentDisposition());
+		assertArrayEquals(EXPECTED_DATA, duri.getData());
 	}
 	
 	
@@ -83,35 +90,25 @@ public class DataUriTest {
 			EXPECTED_DATA
 		);
 		
-		Assert.assertEquals(EXPECTED_MIME, duri.getMime());
-		Assert.assertEquals(EXPECTED_CHARSET, duri.getCharset());
-		Assert.assertEquals(EXPECTED_FILENAME, duri.getFilename());
-		Assert.assertEquals(EXPECTED_CONTENT_DISPOSITION, duri.getContentDisposition());
-		Assert.assertArrayEquals(EXPECTED_DATA, duri.getData());
+		assertEquals(EXPECTED_MIME, duri.getMime());
+		assertEquals(Optional.of(EXPECTED_CHARSET), duri.getCharset());
+		assertEquals(Optional.of(EXPECTED_FILENAME), duri.getFilename());
+		assertEquals(Optional.of(EXPECTED_CONTENT_DISPOSITION), duri.getContentDisposition());
+		assertArrayEquals(EXPECTED_DATA, duri.getData());
 	}
 	
 	
 	
-	@Test
+	@Test(expected = NullPointerException.class)
 	public void testDisallowMimeNull() {
-		try {
-			new DataUri(null, UTF_8, new byte[] {});
-			Assert.fail("MIME must not be null");
-		} catch (NullPointerException e) {
-			// Pass
-		}
+		new DataUri(null, UTF_8, new byte[] {});
 	}
-	
-	
-	
-	@Test
+
+
+
+	@Test(expected = NullPointerException.class)
 	public void testDisallowDataNull() {
-		try {
-			new DataUri("text/plain", UTF_8, null);
-			Assert.fail("Data must not be null");
-		} catch (NullPointerException e) {
-			// Pass
-		}
+		new DataUri("text/plain", UTF_8, null);
 	}
 	
 	
@@ -133,11 +130,11 @@ public class DataUriTest {
 		final String test = "DaTa:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 		DataUri duri = DataUri.parse(test, UTF_8);
 		
-		Assert.assertEquals("image/gif", duri.getMime());
-		Assert.assertEquals(null, duri.getCharset());
-		Assert.assertEquals(null, duri.getFilename());
-		Assert.assertEquals(null, duri.getContentDisposition());
-		Assert.assertArrayEquals(new byte[] {71, 73, 70, 56, 57, 97, 1, 0, 1, 0, -128, 0, 0, -1, -1, -1, 0, 0, 0, 33, -7, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59}, duri.getData());
+		assertEquals("image/gif", duri.getMime());
+		assertEquals(Optional.empty(), duri.getCharset());
+		assertEquals(Optional.empty(), duri.getFilename());
+		assertEquals(Optional.empty(), duri.getContentDisposition());
+		assertArrayEquals(new byte[] {71, 73, 70, 56, 57, 97, 1, 0, 1, 0, -128, 0, 0, -1, -1, -1, 0, 0, 0, 33, -7, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59}, duri.getData());
 	}
 	
 	
@@ -195,11 +192,11 @@ public class DataUriTest {
 		final String test = "data:image/gif;charset=utf-8;filename=test.txt;content-disposition=inline;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 		DataUri duri = DataUri.parse(test, UTF_8);
 		
-		Assert.assertEquals("image/gif", duri.getMime());
-		Assert.assertEquals(Charset.forName("UTF-8"), duri.getCharset());
-		Assert.assertEquals("test.txt", duri.getFilename());
-		Assert.assertEquals("inline", duri.getContentDisposition());
-		Assert.assertArrayEquals(new byte[] {71, 73, 70, 56, 57, 97, 1, 0, 1, 0, -128, 0, 0, -1, -1, -1, 0, 0, 0, 33, -7, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59}, duri.getData());
+		assertEquals("image/gif", duri.getMime());
+		assertEquals(Optional.of(Charset.forName("UTF-8")), duri.getCharset());
+		assertEquals(Optional.of("test.txt"), duri.getFilename());
+		assertEquals(Optional.of("inline"), duri.getContentDisposition());
+		assertArrayEquals(new byte[] {71, 73, 70, 56, 57, 97, 1, 0, 1, 0, -128, 0, 0, -1, -1, -1, 0, 0, 0, 33, -7, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59}, duri.getData());
 	}
 
 
@@ -217,7 +214,7 @@ public class DataUriTest {
 		};
 
 		for (final String testString : testStrings) {
-			Assert.assertEquals(testString, DataUri.parse(testString, UTF_8).toString());
+			assertEquals(testString, DataUri.parse(testString, UTF_8).toString());
 		}
 	}
 
@@ -225,11 +222,11 @@ public class DataUriTest {
 	public void testPlusCharacter() {
 		// spaces shouldn't turn into pluses (see https://github.com/ooxi/jdatauri/issues/10)
 		DataUri duri = DataUri.parse("data:text/plain;charset=utf-8,Hello%2C%20how%20do%20you%20do%3F", UTF_8);
-		Assert.assertEquals("Hello, how do you do?", new String(duri.getData(), duri.getCharset()));
+		assertEquals("Hello, how do you do?", new String(duri.getData(), duri.getCharset().get()));
 
 		// plus in a mime type isn't decoded to space; pluses and spaces in data are decoded correctly.
 		duri = DataUri.parse("data:application/atom+xml;charset=utf-8,%3Ca%3E1%2B1%3D2%20isn%27t%20it%3F%3C%2Fa%3E", UTF_8);
-		Assert.assertEquals("<a>1+1=2 isn't it?</a>", new String(duri.getData(), duri.getCharset()));
-		Assert.assertEquals("application/atom+xml", duri.getMime());
+		assertEquals("<a>1+1=2 isn't it?</a>", new String(duri.getData(), duri.getCharset().get()));
+		assertEquals("application/atom+xml", duri.getMime());
 	}
 }
