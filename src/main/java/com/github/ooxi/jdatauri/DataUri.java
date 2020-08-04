@@ -63,10 +63,10 @@ public class DataUri {
 		this.data = data;
 		
 		if (null == mime) {
-			throw new NullPointerException("`mime' must not be null");
+			throw new IllegalArgumentException("`mime' must not be null");
 		}
 		if (null == data) {
-			throw new NullPointerException("`data' must not be null");
+			throw new IllegalArgumentException("`data' must not be null");
 		}
 	}
 

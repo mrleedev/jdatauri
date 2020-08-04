@@ -99,14 +99,14 @@ public class DataUriTest {
 	
 	
 	
-	@Test(expected = NullPointerException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testDisallowMimeNull() {
 		new DataUri(null, UTF_8, new byte[] {});
 	}
 
 
 
-	@Test(expected = NullPointerException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testDisallowDataNull() {
 		new DataUri("text/plain", UTF_8, null);
 	}
